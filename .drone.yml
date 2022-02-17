@@ -1,0 +1,53 @@
+---
+kind: pipeline
+type: exec
+name: default
+
+clone:
+  disable: true
+
+platform:
+  os: darwin
+  arch: amd64
+
+steps:
+- name: clone
+  commands:
+  - env
+  - git clone --depth 1 --branch=${DRONE_REPO_BRANCH} ${DRONE_REPO_LINK,,} .
+  - git checkout $DRONE_COMMIT
+  when:
+    branch:
+    - master
+    - to_release
+
+- name: commit master
+  commands:
+  - echo "distribute android test"
+  - echo "distribute ios test" 
+  when:
+    event:
+    - promote
+    target:
+    - test
+
+- name: commit release
+  commands:
+  - echo "distribute android release"
+  - echo "distribute ios release"
+  when:
+   event:
+   - promote
+   target:
+   - release
+
+- name: check promote step
+  commands:
+  - echo "promote step execute"
+  when:
+   event:
+   - promote
+   target:
+   - dev
+
+
